@@ -23,7 +23,8 @@ fun makeReanimeWebView(
     activity: MainActivity,
     onProgress: (Int) -> Unit,
     onCurrentUrl: (String) -> Unit,
-    onPageError: (Boolean) -> Unit
+    onPageError: (Boolean) -> Unit,
+    isThemeEnabled: () -> Boolean
 ): WebView = WebView(activity).apply {
     WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
     setBackgroundColor(android.graphics.Color.rgb(16, 17, 19))
@@ -43,6 +44,10 @@ fun makeReanimeWebView(
     CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
 
     webViewClient = object : WebViewClient() {
+        override fun onPageCommitVisible(view: WebView, url: String?) {
+            RavimeWebTheme.apply(activity, view, isThemeEnabled())
+        }
+
         override fun shouldOverrideUrlLoading(
             view: WebView,
             request: WebResourceRequest
@@ -72,6 +77,7 @@ fun makeReanimeWebView(
 
         override fun onPageFinished(view: WebView, url: String?) {
             onCurrentUrl(url ?: "https://reanime.to/home")
+            RavimeWebTheme.apply(activity, view, isThemeEnabled())
         }
 
         override fun onReceivedError(
