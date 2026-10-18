@@ -30,7 +30,7 @@ import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.LiveTv
-import androidx.compose.material.icons.outlined.LockOutline
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.OpenInBrowser
 import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.Settings
@@ -240,7 +240,7 @@ internal fun RavimeLibrary(
             RavenActionRow(
                 "Privacy & security",
                 "Profile visibility, passwords and account security",
-                Icons.Outlined.LockOutline
+                Icons.Outlined.Lock
             ) { openSite("/profile") }
         }
         item { RavenSection("Ravime") }
