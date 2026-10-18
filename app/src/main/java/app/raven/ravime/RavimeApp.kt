@@ -34,6 +34,9 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +73,7 @@ fun RavimeApp(activity: MainActivity) {
     var currentUrl by remember { mutableStateOf("$SITE/home") }
     var progress by remember { mutableIntStateOf(100) }
     var failed by remember { mutableStateOf(false) }
+    var moreExpanded by remember { mutableStateOf(false) }
     val preferences = remember(activity) {
         activity.getSharedPreferences("ravime_preferences", android.content.Context.MODE_PRIVATE)
     }
@@ -83,7 +87,7 @@ fun RavimeApp(activity: MainActivity) {
         makeReanimeWebView(
             activity,
             onProgress = { progress = it },
-            onCurrentUrl = { currentUrl = it },
+            onCurrentUrl = { currentUrl = it; browserIsSearch = Uri.parse(it).path?.startsWith("/search") == true },
             onPageError = { failed = it },
             isThemeEnabled = { websiteThemeEnabled }
         )
@@ -123,10 +127,11 @@ fun RavimeApp(activity: MainActivity) {
         when (page) {
             Page.BROWSER -> {
                 if (browser.canGoBack()) browser.goBack()
-                else page = returnFromBrowser
+                else if (currentUrl != "$SITE/home") browser.loadUrl("$SITE/home")
+                else activity.finish()
             }
             Page.SETTINGS -> page = returnFromSettings
-            Page.LIBRARY -> page = Page.HOME
+            Page.LIBRARY -> openWeb("/home")
             Page.HOME -> Unit
         }
     }
@@ -149,7 +154,7 @@ fun RavimeApp(activity: MainActivity) {
         browser.clearCache(true)
         browser.clearHistory()
         browser.loadUrl("$SITE/home")
-        page = Page.HOME
+        page = Page.BROWSER
     }
 
     BackHandler(enabled = page != Page.HOME) { goBack() }
@@ -177,39 +182,56 @@ fun RavimeApp(activity: MainActivity) {
                         .padding(start = 12.dp, end = 7.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (page == Page.SETTINGS || page == Page.BROWSER) {
+                    if (page == Page.SETTINGS) {
                         IconButton(onClick = ::goBack) {
-                            Icon(
-                                Icons.Outlined.ArrowBack, "Back",
-                                tint = RavenClassic.text
-                            )
+                            Icon(Icons.Outlined.ArrowBack, "Back", tint = RavenClassic.text)
                         }
                     }
                     RavenLabel(
                         if (page == Page.SETTINGS) "Settings" else "Ravime",
                         23, bold = true,
-                        modifier = Modifier.weight(1f)
-                            .clickable {
-                                if (page != Page.SETTINGS) page = Page.HOME
-                            }
+                        modifier = Modifier.weight(1f).clickable {
+                            if (page != Page.SETTINGS) openWeb("/home")
+                        }
                     )
-                    if (page == Page.BROWSER) {
-                        IconButton(onClick = { browser.reload() }) {
-                            Icon(Icons.Outlined.Refresh, "Refresh", tint = RavenClassic.text)
-                        }
-                        IconButton(onClick = ::openInBrowser) {
-                            Icon(
-                                Icons.Outlined.OpenInBrowser, "Open in browser",
-                                tint = RavenClassic.text
-                            )
-                        }
-                    }
                     if (page != Page.SETTINGS) {
                         IconButton(onClick = { openWeb("/search", isSearch = true) }) {
                             Icon(Icons.Outlined.Search, "Search", tint = RavenClassic.text)
                         }
-                        IconButton(onClick = { openWeb("/schedule") }) {
-                            Icon(Icons.Outlined.CalendarMonth, "Schedule", tint = RavenClassic.text)
+                        Box {
+                            IconButton(onClick = { moreExpanded = true }) {
+                                Icon(Icons.Outlined.MoreVert, "More", tint = RavenClassic.text)
+                            }
+                            DropdownMenu(
+                                expanded = moreExpanded,
+                                onDismissRequest = { moreExpanded = false },
+                                modifier = Modifier.background(RavenClassic.panel)
+                            ) {
+                                val destinations = listOf(
+                                    "Discover anime" to "/home",
+                                    "Community & messaging" to "/community",
+                                    "Release schedule" to "/schedule",
+                                    "Watch together" to "/watch2gether",
+                                    "Re:ANIME profile" to "/profile"
+                                )
+                                destinations.forEach { (label, route) ->
+                                    DropdownMenuItem(
+                                        text = { RavenLabel(label, 13) },
+                                        onClick = {
+                                            moreExpanded = false
+                                            openWeb(route)
+                                        }
+                                    )
+                                }
+                                DropdownMenuItem(
+                                    text = { RavenLabel("Refresh page", 13) },
+                                    onClick = { moreExpanded = false; browser.reload() }
+                                )
+                                DropdownMenuItem(
+                                    text = { RavenLabel("Open in browser", 13) },
+                                    onClick = { moreExpanded = false; openInBrowser() }
+                                )
+                            }
                         }
                         IconButton(onClick = ::openSettings) {
                             Icon(Icons.Outlined.Settings, "Settings", tint = RavenClassic.text)
