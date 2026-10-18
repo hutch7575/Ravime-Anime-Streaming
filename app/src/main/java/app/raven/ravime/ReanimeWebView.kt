@@ -75,6 +75,13 @@ fun makeReanimeWebView(
             onCurrentUrl(url ?: "https://reanime.to/home")
         }
 
+        override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
+            super.doUpdateVisitedHistory(view, url, isReload)
+            if (url != null) onCurrentUrl(url)
+            // Keeps the style layer present even when the website navigates client-side.
+            RavimeWebTheme.apply(activity, view, isThemeEnabled())
+        }
+
         override fun onPageFinished(view: WebView, url: String?) {
             onCurrentUrl(url ?: "https://reanime.to/home")
             RavimeWebTheme.apply(activity, view, isThemeEnabled())
