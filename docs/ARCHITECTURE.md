@@ -4,7 +4,7 @@
 
 Present a RAVEN Classic Android companion for Re:ANIME without recreating its backend or copying proprietary code.
 
-## v0.2.0 architecture
+## v0.3.0 architecture
 
 ```text
 MainActivity
@@ -21,7 +21,7 @@ MainActivity
   +-- External browser for non-Re:ANIME top-level URLs
 ```
 
-A single WebView instance keeps cookies, route history and session continuity while the native UI switches tabs. This app contains no custom HTTP client for the service and does not attempt to reverse-engineer private endpoints.
+A single WebView instance keeps cookies, route history and session continuity while the native UI switches tabs. On first-party pages Ravime injects the RAVEN Classic CSS/DOM tagging adapter; it alters appearance, not website logic. Users can switch it off. This app contains no custom HTTP client for the service and does not attempt to reverse-engineer private endpoints.
 
 ## What is native versus web?
 
@@ -53,4 +53,4 @@ A single WebView instance keeps cookies, route history and session continuity wh
 5. Add more RAVEN components: artwork-adaptive accent, poster grids, anime detail transitions and compact episode lists.
 6. Consider notifications/Picture-in-Picture only after supported integration and compatibility validation.
 
-No native screen should claim that it synchronises data unless the required supported integration exists.
+No native screen should claim that it synchronises data unless the required supported integration exists.\n\n### Website theme\n\n`app/src/main/assets/ravime.css` contains the palette, form, modal, anime-card, player, search, schedule, community and profile styling. `ravime.js` tags semantic DOM targets, listens to SPA route changes and uses a MutationObserver to keep page classes current. `RavimeWebTheme.kt` injects and reverses the style safely into the main WebView document. Video streams and third-party frames are excluded from DOM alterations. This is not a private API integration or permission bypass.

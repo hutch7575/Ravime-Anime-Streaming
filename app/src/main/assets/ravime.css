@@ -1,0 +1,228 @@
+/* RAVEN Classic / Ravime — website-level presentation, not a replacement for website behaviour. */
+:root.rv-theme {
+  color-scheme: dark !important;
+  --rv-bg: #101113;
+  --rv-panel: #1b1d1e;
+  --rv-raised: #282b2d;
+  --rv-text: #f7f7f7;
+  --rv-secondary: #b8bcbd;
+  --rv-muted: #8e9294;
+  --rv-green: #a5d66b;
+  --rv-border: rgba(255,255,255,.09);
+  --rv-soft-green: rgba(165,214,107,.14);
+  --background: 220 8% 7%;
+  --foreground: 0 0% 97%;
+  --card: 200 5% 11%;
+  --card-foreground: 0 0% 97%;
+  --popover: 200 5% 11%;
+  --popover-foreground: 0 0% 97%;
+  --primary: 88 56% 63%;
+  --primary-foreground: 220 8% 7%;
+  --secondary: 200 5% 16%;
+  --secondary-foreground: 0 0% 83%;
+  --muted: 200 5% 16%;
+  --muted-foreground: 200 3% 60%;
+  --accent: 88 56% 63%;
+  --accent-foreground: 220 8% 7%;
+  --border: 200 5% 21%;
+  --input: 200 5% 21%;
+  --ring: 88 56% 63%;
+}
+html.rv-theme, html.rv-theme body, html.rv-theme #root, html.rv-theme #__next {
+  background: var(--rv-bg) !important;
+  color: var(--rv-text);
+  font-family: Roboto,"Arial",system-ui,sans-serif !important;
+}
+html.rv-theme body { margin:0!important; overscroll-behavior-y:contain; -webkit-tap-highlight-color:transparent; }
+html.rv-theme * { scrollbar-color:#424749 #101113; }
+html.rv-theme ::selection { color:#101113; background:#a5d66b; }
+html.rv-theme :is(h1,h2,h3,h4,h5,h6) { color:var(--rv-text)!important; letter-spacing:-.025em; font-weight:650; }
+html.rv-theme h1 { font-size:clamp(1.3rem,5.5vw,1.7rem)!important; line-height:1.23!important; }
+html.rv-theme h2 { font-size:clamp(1.08rem,4.2vw,1.35rem)!important; line-height:1.35!important; }
+html.rv-theme h3 { font-size:1rem!important; }
+html.rv-theme :is(p,small,time,label) { line-height:1.5; }
+html.rv-theme a { -webkit-tap-highlight-color:transparent; }
+html.rv-theme a:hover { color:var(--rv-green); }
+html.rv-theme :is(input,textarea,select) {
+  background-color:var(--rv-panel)!important;
+  border:1px solid var(--rv-border)!important;
+  color:var(--rv-text)!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+  accent-color:var(--rv-green)!important;
+  min-height:38px;
+  font-size:14px!important;
+}
+html.rv-theme :is(input,textarea)::placeholder { color:var(--rv-muted)!important; opacity:1; }
+html.rv-theme :is(input,textarea,select,button,a,[role=button],[role=tab]):focus-visible {
+  outline:2px solid var(--rv-green)!important; outline-offset:2px;
+}
+html.rv-theme input[type=checkbox], html.rv-theme input[type=radio], html.rv-theme input[type=range] {
+  accent-color:var(--rv-green)!important; min-height:auto;
+}
+html.rv-theme :is(button,[role=button]) {
+  font-family:inherit; transition:background-color .15s ease,color .15s ease,border-color .15s ease;
+}
+html.rv-theme button:not([class*=absolute]):not([aria-label*=Close]):not([aria-label*=close]) {
+  border-radius:8px;
+}
+html.rv-theme button:is([disabled],[aria-disabled=true]) { opacity:.45; }
+html.rv-theme button[data-state=active], html.rv-theme [role=tab][aria-selected=true],
+html.rv-theme [aria-pressed=true], html.rv-theme [data-state=checked] {
+  color:var(--rv-green)!important;
+  border-color:rgba(165,214,107,.46)!important;
+}
+html.rv-theme :is(button,a,[role=button],[role=tab]) { touch-action:manipulation; }
+html.rv-theme :is(button,[role=button]):is(:active,:focus-visible) { filter:brightness(1.1); }
+html.rv-theme :is([class*=text-green],[class*=text-lime],[class*=text-emerald],[class*=text-primary]) {
+  color:var(--rv-green)!important;
+}
+html.rv-theme :is([class*=bg-green],[class*=bg-lime],[class*=bg-emerald],[class*=bg-primary]) {
+  background-color:var(--rv-green)!important;
+  color:var(--rv-bg);
+}
+html.rv-theme :is([class*=border-green],[class*=border-lime],[class*=border-emerald],[class*=border-primary]) {
+  border-color:rgba(165,214,107,.56)!important;
+}
+html.rv-theme :is([class*=ring-green],[class*=ring-lime],[class*=ring-emerald]) {
+  --tw-ring-color:rgba(165,214,107,.4)!important;
+}
+/* Neutral Tailwind palette translation. Avoid transparent overlays and players. */
+html.rv-theme :is(
+  [class*=bg-zinc-950],[class*=bg-neutral-950],[class*=bg-gray-950],[class*=bg-slate-950],
+  [class*=bg-black]
+):not(video):not(iframe):not([role=dialog]) { background-color:var(--rv-bg)!important; }
+html.rv-theme :is(
+  [class*=bg-zinc-900],[class*=bg-neutral-900],[class*=bg-gray-900],[class*=bg-slate-900]
+):not(video):not(iframe) { background-color:var(--rv-panel)!important; }
+html.rv-theme :is(
+  [class*=bg-zinc-800],[class*=bg-neutral-800],[class*=bg-gray-800],[class*=bg-slate-800]
+):not(video):not(iframe) { background-color:var(--rv-raised)!important; }
+html.rv-theme :is([class*=border-zinc],[class*=border-neutral],[class*=border-gray],[class*=border-white]) {
+  border-color:var(--rv-border);
+}
+html.rv-theme :is([class*=text-zinc-400],[class*=text-neutral-400],[class*=text-gray-400],
+[class*=text-slate-400]) { color:var(--rv-secondary)!important; }
+html.rv-theme :is([class*=text-zinc-500],[class*=text-neutral-500],[class*=text-gray-500]) {
+  color:var(--rv-muted)!important;
+}
+html.rv-theme :is([class*=rounded-2xl],[class*=rounded-3xl],[class*=rounded-xl]) {
+  border-radius:10px!important;
+}
+/* Site chrome is replaced by Ravime's own header/nav. Authentication remains in /profile. */
+html.rv-theme .rv-site-chrome,html.rv-theme .rv-site-footer { display:none!important; }
+/* Page width and spacing: deliberate classic compact density, never scale the video itself. */
+html.rv-theme :is(main,[role=main]) { max-width:100%; min-width:0; }
+html.rv-theme main > :is(section,div) { scroll-margin-top:12px; }
+html.rv-theme :is(main,[role=main]) :is(section,article) { min-width:0; }
+html.rv-theme .rv-main-title { font-size:22px!important; font-weight:650!important; }
+/* Titles and artwork tiles. Use ellipsis only on discovered card labels. */
+html.rv-theme .rv-anime-tile {
+  min-width:0; overflow:hidden;
+  border-radius:7px!important;
+  transition:transform .14s ease;
+}
+html.rv-theme .rv-anime-tile:active { transform:scale(.986); }
+html.rv-theme .rv-anime-tile img {
+  object-fit:cover; border-radius:5px!important;
+}
+html.rv-theme .rv-anime-label {
+  overflow:hidden!important; text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  display:block!important; max-width:100%;
+  font-size:12px!important; line-height:1.5!important;
+}
+html.rv-theme .rv-episode-tile { min-width:0; }
+html.rv-theme .rv-episode-tile:active { background:var(--rv-soft-green)!important; }
+/* Search: compact mobile filters, clear action hierarchy */
+html.rv-theme.rv-route-search input[type=search],
+html.rv-theme.rv-route-search input[placeholder*=earch] {
+  border-radius:9px!important;
+  padding:10px 12px!important;
+  background:var(--rv-panel)!important;
+}
+html.rv-theme.rv-route-search select { max-width:100%; }
+html.rv-theme.rv-route-search :is([role=listbox],[role=combobox]) {
+  border-color:var(--rv-border)!important;
+  background:var(--rv-panel)!important;
+}
+/* Anime detail: keep posters, banners, synopsis and buttons intact. */
+html.rv-theme.rv-route-anime :is(main,[role=main]) img { max-width:100%; }
+html.rv-theme.rv-route-anime button { font-weight:600; }
+/* Streaming video: explicitly preserve black theatre background and embedded controls. */
+html.rv-theme.rv-route-watch video,
+html.rv-theme.rv-route-watch iframe { background:#000!important; border:0!important; }
+html.rv-theme.rv-route-watch :is(video,iframe) { max-width:100%; }
+html.rv-theme.rv-route-watch :is([class*=aspect-video],[class*=player-container]) {
+  overflow:hidden; background:#000!important; border-radius:8px!important;
+}
+html.rv-theme.rv-route-watch :is([role=tab],button) { touch-action:manipulation; }
+/* Community posts: quieter surfaces rather than broad dashboard cards. */
+html.rv-theme.rv-route-community article,
+html.rv-theme.rv-route-community .rv-community-post {
+  background:var(--rv-panel)!important;
+  border:1px solid var(--rv-border)!important;
+  border-radius:9px!important;
+}
+html.rv-theme.rv-route-community :is(textarea,[contenteditable=true]) {
+  color:var(--rv-text)!important;
+  caret-color:var(--rv-green);
+}
+/* Account and preferences: simple rows and narrow control clusters. */
+html.rv-theme.rv-route-profile :is(main,[role=main]) {
+  color:var(--rv-text);
+}
+html.rv-theme.rv-route-profile [role=tablist] {
+  background:var(--rv-panel)!important;
+  border-radius:9px!important;
+  padding:3px!important;
+  gap:3px;
+}
+html.rv-theme.rv-route-profile [role=tab] {
+  min-height:35px; font-size:12px!important;
+}
+html.rv-theme.rv-route-profile :is(input[type=checkbox],input[type=range]) {
+  accent-color:var(--rv-green)!important;
+}
+html.rv-theme.rv-route-profile :is([role=switch],button[aria-checked]) {
+  border-color:var(--rv-border)!important;
+}
+html.rv-theme.rv-route-profile :is([role=switch][aria-checked=true],[data-state=checked]) {
+  background-color:var(--rv-green)!important;
+}
+/* Modal components must stay above both the web page and its scroll containers. */
+html.rv-theme :is([role=dialog],[role=alertdialog],[data-radix-popper-content-wrapper],
+[role=menu],[role=listbox],[cmdk-root]) {
+  background:var(--rv-panel)!important; color:var(--rv-text)!important;
+  border-color:var(--rv-border)!important;
+  box-shadow:0 18px 60px rgba(0,0,0,.48);
+}
+html.rv-theme :is([role=dialog],[role=alertdialog]) {
+  max-width:calc(100vw - 20px)!important;
+  border-radius:10px!important;
+}
+html.rv-theme :is([role=menuitem],[role=option]):focus,
+html.rv-theme :is([role=menuitem],[role=option])[data-highlighted] {
+  background:var(--rv-raised)!important;
+}
+/* The global chat is allowed to operate. Avoid covering native navigation. */
+html.rv-theme .rv-global-chat {
+  bottom:10px!important; max-width:calc(100vw - 12px);
+}
+html.rv-theme :is(a,button,[role=button]) svg { flex-shrink:0; }
+/* Respect viewport bounds while keeping original site's scrolling and gestures. */
+html.rv-theme img { max-width:100%; }
+html.rv-theme :is(pre,code) { overflow-wrap:anywhere; }
+@media (max-width:700px) {
+  html.rv-theme :is(main,[role=main]) { padding-left:clamp(8px,2.5vw,16px); padding-right:clamp(8px,2.5vw,16px); }
+  html.rv-theme h1 { font-size:23px!important; }
+  html.rv-theme h2 { font-size:17px!important; }
+  html.rv-theme :is(button,[role=button]) { min-height:32px; }
+  html.rv-theme :is([class*=text-5xl],[class*=text-4xl],[class*=text-3xl]) {
+    font-size:clamp(18px,5vw,25px)!important; line-height:1.25!important;
+  }
+  html.rv-theme .rv-anime-label { font-size:12px!important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  html.rv-theme * { scroll-behavior:auto!important; transition-duration:0ms!important; animation-duration:.01ms!important; }
+}
