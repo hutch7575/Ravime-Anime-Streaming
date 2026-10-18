@@ -32,6 +32,8 @@ import androidx.compose.material.icons.outlined.OpenInBrowser
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,7 +63,7 @@ private enum class Page { HOME, BROWSER, LIBRARY, SETTINGS }
  */
 @Composable
 fun RavimeApp(activity: MainActivity) {
-    var page by rememberSaveable { mutableStateOf(Page.HOME) }
+    var page by rememberSaveable { mutableStateOf(Page.BROWSER) }
     var returnFromBrowser by remember { mutableStateOf(Page.HOME) }
     var returnFromSettings by remember { mutableStateOf(Page.HOME) }
     var browserIsSearch by rememberSaveable { mutableStateOf(false) }
@@ -74,14 +76,19 @@ fun RavimeApp(activity: MainActivity) {
     var allowVideoAutoplay by remember {
         mutableStateOf(preferences.getBoolean("allow_video_autoplay", true))
     }
+    var websiteThemeEnabled by remember {
+        mutableStateOf(preferences.getBoolean("website_theme_enabled", true))
+    }
     val browser = remember(activity) {
         makeReanimeWebView(
             activity,
             onProgress = { progress = it },
             onCurrentUrl = { currentUrl = it },
-            onPageError = { failed = it }
+            onPageError = { failed = it },
+            isThemeEnabled = { websiteThemeEnabled }
         )
     }
+    LaunchedEffect(browser) { browser.loadUrl("$SITE/home") }
     LaunchedEffect(browser, allowVideoAutoplay) {
         browser.settings.mediaPlaybackRequiresUserGesture = !allowVideoAutoplay
     }
@@ -196,12 +203,14 @@ fun RavimeApp(activity: MainActivity) {
                                 tint = RavenClassic.text
                             )
                         }
-                    } else if (page != Page.SETTINGS) {
+                    }
+                    if (page != Page.SETTINGS) {
                         IconButton(onClick = { openWeb("/search", isSearch = true) }) {
                             Icon(Icons.Outlined.Search, "Search", tint = RavenClassic.text)
                         }
-                    }
-                    if (page != Page.SETTINGS) {
+                        IconButton(onClick = { openWeb("/schedule") }) {
+                            Icon(Icons.Outlined.CalendarMonth, "Schedule", tint = RavenClassic.text)
+                        }
                         IconButton(onClick = ::openSettings) {
                             Icon(Icons.Outlined.Settings, "Settings", tint = RavenClassic.text)
                         }
@@ -232,6 +241,12 @@ fun RavimeApp(activity: MainActivity) {
                         )
                         Page.SETTINGS -> RavimeSettings(
                             autoPlayInWebView = allowVideoAutoplay,
+                            websiteThemeEnabled = websiteThemeEnabled,
+                            onWebsiteThemeChange = {
+                                websiteThemeEnabled = it
+                                preferences.edit().putBoolean("website_theme_enabled", it).apply()
+                                RavimeWebTheme.apply(activity, browser, it)
+                            },
                             onAutoPlayChange = {
                                 allowVideoAutoplay = it
                                 preferences.edit().putBoolean("allow_video_autoplay", it).apply()
@@ -287,7 +302,7 @@ fun RavimeApp(activity: MainActivity) {
                         Page.HOME -> 0
                     }
                     RavimeNavItem("Home", Icons.Outlined.Home, selectedIndex == 0,
-                        Modifier.weight(1f)) { page = Page.HOME }
+                        Modifier.weight(1f)) { openWeb("/home") }
                     RavimeNavItem("Search", Icons.Outlined.Search, selectedIndex == 1,
                         Modifier.weight(1f)) { openWeb("/search", isSearch = true) }
                     RavimeNavItem("Your Library", Icons.Outlined.MenuBook, selectedIndex == 2,
