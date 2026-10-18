@@ -266,6 +266,8 @@ internal fun RavimeLibrary(
 @Composable
 internal fun RavimeSettings(
     autoPlayInWebView: Boolean,
+    websiteThemeEnabled: Boolean,
+    onWebsiteThemeChange: (Boolean) -> Unit,
     onAutoPlayChange: (Boolean) -> Unit,
     onClearSiteData: () -> Unit,
     openSite: (String) -> Unit
@@ -290,6 +292,39 @@ internal fun RavimeSettings(
                 "Accent colour",
                 "RAVEN Green",
                 Icons.Outlined.AutoAwesome
+            )
+        }
+        item { RavenSection("Website appearance") }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    RavenLabel("RAVEN website theme", 13, bold = true)
+                    RavenLabel(
+                        "Apply RAVEN Green to Re:ANIME pages, search, player, community and account settings.",
+                        11, RavenClassic.secondary, lines = 3
+                    )
+                }
+                Spacer(Modifier.width(12.dp))
+                Switch(
+                    checked = websiteThemeEnabled,
+                    onCheckedChange = onWebsiteThemeChange,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = RavenClassic.background,
+                        checkedTrackColor = RavenClassic.accent,
+                        uncheckedThumbColor = RavenClassic.secondary,
+                        uncheckedTrackColor = RavenClassic.raised
+                    )
+                )
+            }
+        }
+        item {
+            RavenNote(
+                "Theme changes are visual only. The website still handles video, " +
+                    "search results, login, ads and comments. Turn this off if a " +
+                    "site update causes an interface problem."
             )
         }
         item { RavenSection("Browser") }
@@ -358,7 +393,7 @@ internal fun RavimeSettings(
         item { RavenSection("About") }
         item {
             RavenLabel("Ravime Anime Streaming", 13, bold = true)
-            RavenLabel("Version 0.2.0 · RAVEN Classic", 11, RavenClassic.secondary)
+            RavenLabel("Version 0.3.0 · RAVEN Classic", 11, RavenClassic.secondary)
             Spacer(Modifier.height(5.dp))
             RavenNote("Independent and unofficial companion for Re:ANIME.")
         }
