@@ -114,8 +114,8 @@ internal fun RavenActionRow(
     title: String,
     subtitle: String,
     icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth().clickable(onClick = onClick)
