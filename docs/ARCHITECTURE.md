@@ -4,13 +4,13 @@
 
 Present a RAVEN Classic Android companion for Re:ANIME without recreating its backend or copying proprietary code.
 
-## v0.1.0 architecture
+## v0.2.0 architecture
 
 ```text
 MainActivity
   |-- Android file chooser and fullscreen video
   |-- RavimeApp (Jetpack Compose)
-  |     |-- RAVEN Classic native home and navigation
+  |     |-- RAVEN Classic native home, profile, settings and navigation
   |     +-- ReanimeWebView (persistent session)
   |            |-- https://reanime.to/home
   |            |-- https://reanime.to/search
@@ -27,9 +27,9 @@ A single WebView instance keeps cookies, route history and session continuity wh
 
 | Feature | Current owner |
 | --- | --- |
-| App home, navigation, quick links, accent, Android fullscreen host | Ravime |
+| App home, navigation, profile hub, local browser preferences, green accent, Android fullscreen host | Ravime |
 | Anime catalogue, detailed anime pages, search results | Website in WebView |
-| Accounts, comments, watchlist, community | Website in WebView |
+| Accounts, comments, watchlist, community and ad preferences | Website in WebView |
 | Streaming player, server lists, episode switching | Website in WebView |
 | Watch parties, real-time chat | Website in WebView, unverified |
 | Android push notifications and native offline playback | Not implemented |
@@ -46,7 +46,7 @@ A single WebView instance keeps cookies, route history and session continuity wh
 
 ## Roadmap
 
-1. Validate Android login, browser back behavior, video playback, fullscreen, site messaging and file uploads.
+1. Validate native profile/settings shortcuts, site Disable Ads toggle after sign-in, Android login, browser back behavior, video playback, fullscreen, site messaging and file uploads.
 2. Fix device-specific compatibility and refine native navigation.
 3. Request/identify supported integration methods from the Re:ANIME operators.
 4. If authorised, implement native search, anime information, library and user profile screens with typed data models.

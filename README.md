@@ -4,16 +4,16 @@
 
 The app adopts the RAVEN Classic (2016-era Android) visual language and offers a native navigation shell around the publicly accessible website at [Re:ANIME](https://reanime.to). Ravime does **not** own or operate that service.
 
-## Current implementation — 0.1.0
+## Current implementation — 0.2.0
 
 - Native Android application written in Kotlin and Jetpack Compose.
 - RAVEN Classic surfaces, compact typography, restrained corners and bottom navigation.
-- Native welcome/home page with links to discovery, search, schedule, community, watch parties and account settings.
-- Persistent WebView session for Re:ANIME pages, including site-managed sign-in, search, discussions and playback when supported by Android WebView.
+- RAVEN Classic redesigned home with a Ravyn-inspired greeting, compact content sections and an updated three-tab navigation dock.
+- Native Your Library/profile hub and native settings screen, both integrated with the existing persistent Re:ANIME WebView session.
 - Fullscreen video handoff to the Android window and rotation support.
 - Android file picker for site-supported community uploads.
 - External navigation opens the user's browser; no native JavaScript bridge or credential scraping.
-- GitHub Actions debug APK build.
+- Native WebView autoplay control and browser-data clear confirmation.\n- Quick links to Re:ANIME's actual account and ad-disable preferences (requires sign-in).\n- GitHub Actions debug APK build.
 
 **Important:** The detailed Re:ANIME browsing and playback pages are still website-rendered, not fully re-skinned. A genuinely native catalogue, anime details, progress management or chat requires an authorised, documented API (or cooperation from the service). Playback, login, chat and Watch2Gether compatibility must be tested on a real Android device. Nothing here guarantees all website features work.
 
@@ -36,7 +36,7 @@ RAVEN Classic follows Ravyn's current source-level tokens:
 | Secondary text | `#B8BCBD` |
 | Muted | `#8E9294` |
 
-Ravime uses a temporary muted lavender accent. Artwork-based adaptive accents can replace it when genuine native artwork data is available. Square thumbnails, 10dp panel radii and compact information density carry over from Ravyn.
+Ravime's accent is **RAVEN Green** (`#A5D66B`) throughout navigation, controls, progress feedback, tiles and the app icon. Compact headings, subdued gradient headers and 10dp panel radii are drawn from Ravyn's current source.\n\nWebsite account, ads, playback and sync preferences remain on Re:ANIME's `/profile` page. Signing in is required to change site-owned preferences; Ravime never claims native access to private profile data or settings.
 
 ## Important limitations and rights
 
