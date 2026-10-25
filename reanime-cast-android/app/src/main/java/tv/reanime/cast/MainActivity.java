@@ -66,19 +66,32 @@ public final class MainActivity extends Activity {
         b.setOnClickListener(v->task.run());
         return b;
     }
+    TextView smallControl(String label, int size, int width, Runnable action) {
+        TextView v = label(label, size, 0xFFE5E3EA);
+        v.setGravity(Gravity.CENTER);
+        v.setPadding(0,0,0,0);
+        v.setMinWidth(0);
+        v.setMinHeight(0);
+        v.setOnClickListener(w -> action.run());
+        v.setClickable(true);
+        return v;
+    }
     void createUi() {
         root=new FrameLayout(this); root.setBackgroundColor(0xFF0F0F15); setContentView(root);
         layout=new LinearLayout(this);layout.setOrientation(LinearLayout.VERTICAL);
         root.addView(layout,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout toolbar=new LinearLayout(this); toolbar.setBackgroundColor(0xFF16161E);
         toolbar.setGravity(Gravity.CENTER_VERTICAL);
-        layout.addView(toolbar,new LinearLayout.LayoutParams(-1,dp(54)));
-        TextView brand=label("Re;Anime",18,0xFFB799FF);
+        layout.addView(toolbar,new LinearLayout.LayoutParams(-1,dp(38)));
+        TextView brand=label("Re;Anime",14,0xFFB799FF);
         brand.setTypeface(null,Typeface.BOLD);
         toolbar.addView(brand,new LinearLayout.LayoutParams(0,-1,1));
-        toolbar.addView(button("‹",()->{if(web.canGoBack())web.goBack();}),new LinearLayout.LayoutParams(dp(48),-1));
-        toolbar.addView(button("↻",()->web.reload()),new LinearLayout.LayoutParams(dp(48),-1));
-        toolbar.addView(button("Cast",this::togglePanel),new LinearLayout.LayoutParams(dp(90),-1));
+        toolbar.addView(smallControl("‹",22,36,()->{if(web.canGoBack())web.goBack();}),new LinearLayout.LayoutParams(dp(36),-1));
+        toolbar.addView(smallControl("↻",20,36,()->web.reload()),new LinearLayout.LayoutParams(dp(36),-1));
+        TextView castControl=smallControl("Cast",13,62,this::togglePanel);
+        castControl.setTextColor(0xFFC5A7FF);
+        castControl.setTypeface(null,Typeface.BOLD);
+        toolbar.addView(castControl,new LinearLayout.LayoutParams(dp(62),-1));
 
         web=new WebView(this);
         web.setBackgroundColor(Color.BLACK);
@@ -107,6 +120,7 @@ public final class MainActivity extends Activity {
             @Override public void onShowCustomView(View view,CustomViewCallback callback) {
                 if(fullScreenView!=null){callback.onCustomViewHidden();return;}
                 fullScreenView=view;fullScreenCallback=callback;
+                if(panel!=null)panel.setVisibility(View.GONE);
                 root.addView(view,new FrameLayout.LayoutParams(-1,-1));
                 layout.setVisibility(View.GONE);
             }
@@ -135,21 +149,32 @@ public final class MainActivity extends Activity {
             }
         });
         panel=new ScrollView(this);panel.setVisibility(View.GONE);
-        layout.addView(panel,new LinearLayout.LayoutParams(-1,dp(265)));
+        FrameLayout.LayoutParams sheetPosition=new FrameLayout.LayoutParams(-1,dp(245),Gravity.BOTTOM);
+        sheetPosition.setMargins(dp(8),0,dp(8),dp(8));
+        panel.setElevation(dp(12));
+        root.addView(panel,sheetPosition);
         LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(dp(10),dp(6),dp(10),dp(12));content.setBackgroundColor(0xFF181820);
+        content.setPadding(dp(10),dp(7),dp(10),dp(10));
+        android.graphics.drawable.GradientDrawable sheetBg=new android.graphics.drawable.GradientDrawable();
+        sheetBg.setColor(0xF51C1C26);
+        sheetBg.setCornerRadius(dp(14));
+        content.setBackground(sheetBg);
         panel.addView(content);
-        TextView heading=label("PAIR WITH ROKU RECEIVER",12,0xFFB799FF);
-        content.addView(heading);
+        LinearLayout capRow = new LinearLayout(this);capRow.setGravity(Gravity.CENTER_VERTICAL);
+        content.addView(capRow,new LinearLayout.LayoutParams(-1,dp(30)));
+        TextView heading=label("ROKU CAST",12,0xFFC6AAFF);
+        heading.setTypeface(null,Typeface.BOLD);
+        capRow.addView(heading,new LinearLayout.LayoutParams(0,-1,1));
+        capRow.addView(smallControl("✕",17,32,this::togglePanel),new LinearLayout.LayoutParams(dp(32),-1));
         pairing=label("",14,Color.WHITE);content.addView(pairing);
         count=label("",13,0xFFD1D1D8);content.addView(count);
         status=label("",12,0xFFBBBBCC);content.addView(status);
         LinearLayout r=new LinearLayout(this);content.addView(r);
-        r.addView(button("Select video",this::chooseVideo),new LinearLayout.LayoutParams(0,dp(54),1));
-        r.addView(button("Select subtitles",this::chooseSubtitle),new LinearLayout.LayoutParams(0,dp(54),1));
+        r.addView(button("Select video",this::chooseVideo),new LinearLayout.LayoutParams(0,dp(44),1));
+        r.addView(button("Subtitles",this::chooseSubtitle),new LinearLayout.LayoutParams(0,dp(44),1));
         LinearLayout r2=new LinearLayout(this);content.addView(r2);
-        r2.addView(button("Test Roku player",this::testVideo),new LinearLayout.LayoutParams(0,dp(54),1));
-        r2.addView(button("Enter stream URL",this::enterUrl),new LinearLayout.LayoutParams(0,dp(54),1));
+        r2.addView(button("Test Roku",this::testVideo),new LinearLayout.LayoutParams(0,dp(44),1));
+        r2.addView(button("Stream URL",this::enterUrl),new LinearLayout.LayoutParams(0,dp(44),1));
         updateInfo();
     }
     void togglePanel(){panel.setVisibility(panel.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE);updateInfo();}
@@ -267,6 +292,7 @@ public final class MainActivity extends Activity {
     }
     @Override public void onBackPressed(){
         if(fullScreenView!=null){web.getWebChromeClient().onHideCustomView();return;}
+        if(panel!=null&&panel.getVisibility()==View.VISIBLE){panel.setVisibility(View.GONE);return;}
         if(web!=null&&web.canGoBack()){web.goBack();return;}
         super.onBackPressed();
     }
