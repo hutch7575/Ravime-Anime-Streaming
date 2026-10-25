@@ -69,7 +69,7 @@ final class CastServer {
             String playUrl=url;
             if(relay) {
                 String id=register(new Resource(url,referer,origin,userAgent));
-                playUrl="http://"+phoneIp+":"+PORT+"/stream/"+id+"?code="+code;
+                playUrl="http://"+phoneIp+":"+PORT+"/stream/"+id+suffix(url)+"?code="+code;
             }
             obj.put("id",Long.toString(System.currentTimeMillis()));
             obj.put("url",playUrl);
@@ -142,6 +142,8 @@ final class CastServer {
             }
             if(path.getPath().startsWith("/stream/")) {
                 String id=path.getPath().substring("/stream/".length());
+                int dot=id.indexOf(".");
+                if(dot>=0)id=id.substring(0,dot);
                 Resource r=media.get(id);
                 if(r==null) {respond(sock,404,"text/plain","Expired media link");return;}
                 proxy(sock,r,range);
@@ -264,8 +266,17 @@ final class CastServer {
             if(!validRemote(resolved))return raw;
             String id=register(new Resource(resolved,origin.referer,origin.origin,origin.userAgent));
             // The Roku fetches this relay URL; it does not see the upstream token.
-            return "http://"+sessionIp()+":"+PORT+"/stream/"+id+"?code="+code;
+            return "http://"+sessionIp()+":"+PORT+"/stream/"+id+suffix(resolved)+"?code="+code;
         } catch(Exception ex) {return raw;}
+    }
+    private String suffix(String url) {
+        try {
+            String p=new URI(url).getPath().toLowerCase(Locale.ROOT);
+            for(String ext:new String[]{".m3u8",".m4s",".ts",".mp4",".aac",".vtt",".srt",".key",".mp3"}) {
+                if(p.endsWith(ext))return ext;
+            }
+        } catch(Exception ignored) {}
+        return ".bin";
     }
     private volatile String hostIp="127.0.0.1";
     private String sessionIp(){return hostIp;}
