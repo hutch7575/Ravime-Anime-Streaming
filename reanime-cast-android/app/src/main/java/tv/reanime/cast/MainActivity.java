@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.*;
 import android.webkit.*;
+import android.webkit.CookieManager;
 import android.widget.*;
 import java.net.*;
 import java.util.*;
