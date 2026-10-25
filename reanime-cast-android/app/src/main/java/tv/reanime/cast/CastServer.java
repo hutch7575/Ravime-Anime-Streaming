@@ -31,7 +31,8 @@ final class CastServer {
             }
         });
     }
-    void publish(String url, String format, String title, String subtitle) {
+    void publish(String url, String format, String title, String subtitle,
+                 String referer, String origin, String userAgent) {
         JSONObject obj = new JSONObject();
         try {
             obj.put("id", Long.toString(System.currentTimeMillis()));
@@ -39,6 +40,11 @@ final class CastServer {
             obj.put("format", format);
             obj.put("title", title);
             obj.put("subtitle", subtitle == null ? "" : subtitle);
+            JSONObject browser = new JSONObject();
+            browser.put("referer", referer == null ? "" : referer);
+            browser.put("origin", origin == null ? "" : origin);
+            browser.put("userAgent", userAgent == null ? "" : userAgent);
+            obj.put("headers", browser);
         } catch (Exception ignored) {}
         session = obj;
     }

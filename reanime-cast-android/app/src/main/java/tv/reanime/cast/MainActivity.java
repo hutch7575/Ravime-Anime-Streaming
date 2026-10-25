@@ -32,6 +32,7 @@ public final class MainActivity extends Activity {
 
     static final class Media {
         String url, type;
+        String referer = "", origin = "", userAgent = "";
         Media(String u, String t) { url=u; type=t; }
         String label() {
             try {
@@ -123,7 +124,14 @@ public final class MainActivity extends Activity {
             @Override public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest req) {
                 String u=req.getUrl()==null?"":req.getUrl().toString();
                 String kind=detectKind(u);
-                if(kind!=null)handler.post(()->collect(u,kind));
+                if(kind!=null) {
+                    Map<String,String> requestHeaders = req.getRequestHeaders();
+                    // Whitelist only non-secret player headers; never send cookies or authorization.
+                    String referer = header(requestHeaders, "referer");
+                    String origin = header(requestHeaders, "origin");
+                    String userAgent = header(requestHeaders, "user-agent");
+                    handler.post(()->collect(u,kind,referer,origin,userAgent));
+                }
                 return null;
             }
         });
@@ -226,13 +234,45 @@ public final class MainActivity extends Activity {
         }catch(Exception ignore){}
         return null;
     }
-    void collect(String url,String type){
+    static String header(Map<String,String> headers,String name) {
+        if(headers == null) return "";
+        for(Map.Entry<String,String> entry:headers.entrySet()) {
+            if(name.equalsIgnoreCase(entry.getKey())) {
+                String value=entry.getValue();
+                if(value == null || value.length()>800 ||
+                   value.indexOf('\r')>=0 || value.indexOf('\n')>=0) return "";
+                if(("referer".equals(name) || "origin".equals(name)) &&
+                   !(value.startsWith("https://") || value.startsWith("http://"))) return "";
+                return value;
+            }
+        }
+        return "";
+    }
+    void collect(String url,String type) { collect(url,type,"","",""); }
+    void collect(String url,String type,String referer,String origin,String userAgent) {
         if(url==null||url.length()>4096||detectKind(url)==null)return;
         LinkedHashMap<String,Media> map="subtitle".equals(type)?subtitles:media;
-        if(!map.containsKey(url)){
+        Media item=map.get(url);
+        if(item==null) {
             if(map.size()>=40)map.remove(map.keySet().iterator().next());
-            map.put(url,new Media(url,type));updateInfo();
+            item=new Media(url,type);
+            map.put(url,item);
         }
+        if(!referer.isEmpty())item.referer=referer;
+        if(!origin.isEmpty())item.origin=origin;
+        if(!userAgent.isEmpty())item.userAgent=userAgent;
+        updateInfo();
+    }
+    static int mediaPriority(Media item) {
+        String url=item.url.toLowerCase(Locale.ROOT);
+        if(url.contains("master.m3u8") || url.contains("index.m3u8")) return 0;
+        if(url.endsWith(".mp4")) return 1;
+        if(url.endsWith(".m3u8")) {
+            if(url.contains("/audio/") || url.contains("native.m3u8"))return 5;
+            if(url.contains("/video/") || url.contains("video.m3u8"))return 3;
+            return 2;
+        }
+        return 4;
     }
     void scanPeriodic(){
         if(isFinishing()||isDestroyed())return;
@@ -264,9 +304,12 @@ public final class MainActivity extends Activity {
               .setPositiveButton("OK",null).show();return;
         }
         ArrayList<Media> items=new ArrayList<>(media.values());
-        Collections.reverse(items);
+        items.sort((a,b)->Integer.compare(mediaPriority(a),mediaPriority(b)));
         String[] options=new String[items.size()];
-        for(int i=0;i<items.size();i++)options[i]=items.get(i).label();
+        for(int i=0;i<items.size();i++) {
+            Media item=items.get(i);
+            options[i]=(mediaPriority(item)==0?"RECOMMENDED · ":"")+item.label();
+        }
         new AlertDialog.Builder(this).setTitle("Cast video to Roku")
           .setItems(options,(d,i)->send(items.get(i)))
           .setNegativeButton("Cancel",null).show();
@@ -284,7 +327,9 @@ public final class MainActivity extends Activity {
     void send(Media m){
         if(!serverActive){setStatus("Pairing server unavailable");return;}
         String title=web.getTitle();
-        server.publish(m.url,m.type,title==null?"Re;Anime":title,chosenSubtitle);
+        String userAgent = m.userAgent.isEmpty() ? web.getSettings().getUserAgentString() : m.userAgent;
+        server.publish(m.url,m.type,title==null?"Re;Anime":title,chosenSubtitle,
+            m.referer,m.origin,userAgent);
         setStatus("Sent to Roku receiver · "+m.type.toUpperCase(Locale.ROOT));
     }
     void enterUrl(){
