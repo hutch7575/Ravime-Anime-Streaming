@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.*;
 import org.json.JSONObject;
 
@@ -23,6 +24,10 @@ final class CastServer {
     private final ConcurrentHashMap<String,Resource> media = new ConcurrentHashMap<>();
     private volatile JSONObject session = new JSONObject();
     private volatile String relayStatus = "Idle";
+    private final AtomicLong manifestCount = new AtomicLong();
+    private final AtomicLong mediaCount = new AtomicLong();
+    private final AtomicLong mediaBytes = new AtomicLong();
+    private final AtomicLong failureCount = new AtomicLong();
     private volatile boolean running;
     private ServerSocket listener;
 
@@ -60,6 +65,10 @@ final class CastServer {
                  String referer, String origin, String userAgent, String phoneIp) {
         hostIp=phoneIp;
         media.clear();
+        manifestCount.set(0);
+        mediaCount.set(0);
+        mediaBytes.set(0);
+        failureCount.set(0);
         relayStatus="Waiting for Roku";
         boolean relay = "hls".equalsIgnoreCase(format)
                         && phoneIp.matches("[0-9.]+")
@@ -137,6 +146,8 @@ final class CastServer {
             if("/session".equals(path.getPath())) {
                 JSONObject out=new JSONObject(session.toString());
                 out.put("relayStatus",relayStatus);
+                out.put("relayStats", "M3U8: "+manifestCount.get()+" | Segments: "+
+                    mediaCount.get()+" | MB: "+(mediaBytes.get()/1048576)+" | Failures: "+failureCount.get());
                 respond(sock,200,"application/json; charset=utf-8",out.toString());
                 return;
             }
@@ -172,6 +183,7 @@ final class CastServer {
             if(cookies!=null && !cookies.isEmpty())upstream.setRequestProperty("Cookie",cookies);
             int status=upstream.getResponseCode();
             if(status<200 || status>=300) {
+                failureCount.incrementAndGet();
                 relayStatus="Host HTTP "+status+" ("+safeHost(r.url)+")";
                 respond(sock,502,"text/plain","Upstream HTTP "+status);
                 return;
@@ -185,11 +197,13 @@ final class CastServer {
                 byte[] raw=readLimited(upstream.getInputStream(),2*1024*1024);
                 String playlist=new String(raw,StandardCharsets.UTF_8);
                 if(!playlist.trim().startsWith("#EXTM3U")) {
+                    failureCount.incrementAndGet();
                     relayStatus="Host returned non-HLS response ("+safeHost(r.url)+")";
                     respond(sock,502,"text/plain","Upstream was not an HLS playlist");
                     return;
                 }
                 String processed=rewriteHls(playlist,finalUrl,r);
+                manifestCount.incrementAndGet();
                 relayStatus="HLS playlist delivered from phone";
                 respond(sock,200,"application/vnd.apple.mpegurl",processed);
             } else {
@@ -209,12 +223,17 @@ final class CastServer {
                 try(InputStream input=upstream.getInputStream()) {
                     byte[] buffer=new byte[32768];
                     int n;
-                    while((n=input.read(buffer))!=-1) out.write(buffer,0,n);
+                    while((n=input.read(buffer))!=-1) {
+                        out.write(buffer,0,n);
+                        mediaBytes.addAndGet(n);
+                    }
                 }
                 out.flush();
+                mediaCount.incrementAndGet();
                 relayStatus="Media segment delivered";
             }
         } catch(Exception ex) {
+            failureCount.incrementAndGet();
             relayStatus="Relay request failed: "+ex.getClass().getSimpleName();
             throw new IOException(ex);
         } finally {
