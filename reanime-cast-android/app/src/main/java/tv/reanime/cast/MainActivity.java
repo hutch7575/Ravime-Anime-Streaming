@@ -78,6 +78,17 @@ public final class MainActivity extends Activity {
     }
     void createUi() {
         root=new FrameLayout(this); root.setBackgroundColor(0xFF0F0F15); setContentView(root);
+        // Android 15+ draws apps edge-to-edge when targeting API 35.
+        // Keep our toolbar below the status bar and the cast sheet above navigation gestures.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            root.setOnApplyWindowInsetsListener((view, windowInsets) -> {
+                android.graphics.Insets safe = windowInsets.getInsets(
+                    WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                view.setPadding(safe.left, safe.top, safe.right, safe.bottom);
+                return windowInsets;
+            });
+            root.requestApplyInsets();
+        }
         layout=new LinearLayout(this);layout.setOrientation(LinearLayout.VERTICAL);
         root.addView(layout,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout toolbar=new LinearLayout(this); toolbar.setBackgroundColor(0xFF16161E);
