@@ -329,8 +329,9 @@ public final class MainActivity extends Activity {
         String title=web.getTitle();
         String userAgent = m.userAgent.isEmpty() ? web.getSettings().getUserAgentString() : m.userAgent;
         server.publish(m.url,m.type,title==null?"Re;Anime":title,chosenSubtitle,
-            m.referer,m.origin,userAgent);
-        setStatus("Sent to Roku receiver · "+m.type.toUpperCase(Locale.ROOT));
+            m.referer,m.origin,userAgent,localIp());
+        setStatus("Sent to Roku · "+("hls".equals(m.type) ? "phone HLS relay" : m.type.toUpperCase(Locale.ROOT)));
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
     void enterUrl(){
         EditText entry=new EditText(this);entry.setSingleLine(true);
